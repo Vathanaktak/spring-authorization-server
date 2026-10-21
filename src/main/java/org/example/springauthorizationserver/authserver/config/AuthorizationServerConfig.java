@@ -24,7 +24,9 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -89,17 +91,17 @@ public class AuthorizationServerConfig {
         return http.build();
     }
 
-    // 3. Default Web Security Filter Chain (Handles user login, registration & demo client UI)
+    // 3. Default Web Security Filter Chain (Handles user login, registration, home & demo client UI)
     @Bean
     @Order(3)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/client/**", "/register", "/login", "/error", "/webjars/**").permitAll()
+                        .requestMatchers("/", "/client/**", "/register", "/login", "/error", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf((csrf) -> csrf.ignoringRequestMatchers("/register"))
-                .formLogin(Customizer.withDefaults());
+                .formLogin((form) -> form.defaultSuccessUrl("/", false));
 
         return http.build();
     }
@@ -108,6 +110,12 @@ public class AuthorizationServerConfig {
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return NimbusJwtDecoder.withJwkSource(jwkSource).build();
+    }
+
+    // JWT Encoder for issuing tokens
+    @Bean
+    public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
     }
 
     // 5. Password Encoder supporting {noop}, {bcrypt}, etc.
