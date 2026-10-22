@@ -410,10 +410,6 @@ public class JdbcRegisteredClientRepository implements RegisteredClientRepositor
 
 	}
 
-	/**
-	 * The default {@code Function} that maps {@link RegisteredClient} to a {@code List}
-	 * of {@link SqlParameterValue} using an instance of Jackson 3's {@link JsonMapper}.
-	 */
 	public static class JsonMapperRegisteredClientParametersMapper extends AbstractRegisteredClientParametersMapper {
 
 		private final JsonMapper jsonMapper;
@@ -525,13 +521,6 @@ public class JdbcRegisteredClientRepository implements RegisteredClientRepositor
 
 	}
 
-	/**
-	 * Nested class to protect from getting {@link NoClassDefFoundError} when Jackson 2 is
-	 * not on the classpath.
-	 *
-	 * @deprecated This is used to allow transition to Jackson 3. Use {@link Jackson3}
-	 * instead.
-	 */
 	@Deprecated(forRemoval = true, since = "7.0")
 	private static final class Jackson2 {
 
